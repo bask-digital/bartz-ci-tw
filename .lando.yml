@@ -1,0 +1,6 @@
+name: bartz-ci-tw
+recipe: pantheon
+config:
+  framework: wordpress
+  site: bartz-ci-tw
+  id: 31f47f19-66a3-463e-b53a-81f3fbeb0ce1
