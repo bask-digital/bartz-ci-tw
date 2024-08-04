@@ -24,14 +24,14 @@ env:
 
 jobs:
   configure_env_vars:
+    container:
+      image: quay.io/pantheon-public/build-tools-ci:6.x
+      options: --user root
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Cache bash_env.txt
         uses: actions/cache@v3
         env:
@@ -39,19 +39,50 @@ jobs:
         with:
           path: bash_env.txt
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
+
+      # Set TERMINUS_ENV and related environment variables.
+      # https://github.com/pantheon-systems/docker-build-tools-ci/blob/6.x/scripts/set-environment
       - name: setup-environment-vars
         run: |
-          # Your setup environment variables script
+          if [ "$CI_BRANCH" != "refs/heads/master" ]; then
+            export PR_NUMBER=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.groot-preview+json" \
+              "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
+              python3 -c "import sys, json; print(json.load(sys.stdin)[0]['number'])"`
+
+            export CI_BRANCH=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.groot-preview+json" \
+              "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
+              python3 -c "import sys, json; print(json.load(sys.stdin)[0]['head']['ref'])"`
+
+            export CI_PULL_REQUEST=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.groot-preview+json" \
+              "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
+              python3 -c "import sys, json; print(json.load(sys.stdin)[0]['html_url'])"`
+          else
+            export CI_BRANCH="master"
+          fi
+          export CI_PROJECT_REPONAME=`curl -u "${GITHUB_OWNER}:${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github.groot-preview+json" \
+            "https://api.github.com/repos/${CI_PROJECT_NAME}/commits/${COMMIT_SHA}/pulls" | \
+            python3 -c "import sys, json; print(json.load(sys.stdin)[0]['base']['repo']['name'])"`
+          export CI_PROJECT_USERNAME=$GITHUB_REPOSITORY_OWNER
+          /build-tools-ci/scripts/set-environment
+          GITHUB_WORKFLOW_URL=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+          echo "export CI_BUILD_URL='${GITHUB_WORKFLOW_URL}'" >> $BASH_ENV
+          echo "export CI_NODE_INDEX=0" >> $BASH_ENV
+          echo "export CI_REPOSITORY_URL='https://github.com/${GITHUB_REPOSITORY}'" >> $BASH_ENV
+          echo "export ARTIFACTS_DIR_URL='${GITHUB_WORKFLOW_URL}/#artifacts'" >> $BASH_ENV
 
   build_php:
+    container:
+      image: quay.io/pantheon-public/build-tools-ci:6.x
+      options: --user root
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Cache composer cache
         uses: actions/cache@v3
         env:
@@ -63,6 +94,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
       - name: Cache vendor folder
         uses: actions/cache@v3
         env:
@@ -70,6 +102,7 @@ jobs:
         with:
           path: ./vendor
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('composer.lock') }}
+
       - name: Cache web folder
         uses: actions/cache@v3
         env:
@@ -77,6 +110,7 @@ jobs:
         with:
           path: ./web
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('composer.lock') }}
+
       - name: Cache drush folder
         uses: actions/cache@v3
         env:
@@ -84,23 +118,27 @@ jobs:
         with:
           path: ./drush
           key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+      # Set TERMINUS_ENV and related environment variables.
+      # https://github.com/pantheon-systems/docker-build-tools-ci/blob/6.x/scripts/set-environment
       - name: setup-environment-vars
         run: /build-tools-ci/scripts/set-environment
+
       - name: run PHP build step
         run: ./.ci/build/php
 
   deploy_to_pantheon:
+    container:
+      image: quay.io/pantheon-public/build-tools-ci:6.x
+      options: --user root
     runs-on: ubuntu-latest
     needs: [configure_env_vars, build_php]
     steps:
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - name: Cache bash_env.txt
         uses: actions/cache@v3
         env:
@@ -112,6 +150,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
       - name: Cache composer cache
         uses: actions/cache@v3
         env:
@@ -123,6 +162,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
       - name: Cache vendor folder
         uses: actions/cache@v3
         env:
@@ -130,6 +170,7 @@ jobs:
         with:
           path: ./vendor
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('composer.lock') }}
+
       - name: Cache web folder
         uses: actions/cache@v3
         env:
@@ -137,6 +178,7 @@ jobs:
         with:
           path: ./web
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('composer.lock') }}
+
       - name: Cache drush folder
         uses: actions/cache@v3
         env:
@@ -144,10 +186,17 @@ jobs:
         with:
           path: ./drush
           key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+      # Set TERMINUS_ENV and related environment variables.
+      # https://github.com/pantheon-systems/docker-build-tools-ci/blob/6.x/scripts/set-environment
       - name: setup-environment-vars
         run: /build-tools-ci/scripts/set-environment
+
+      # Rsync the build artifact pieces web directory
       - name: sync build artifact
         run: rsync -rz ./web ./vendor .
+
+      # Deploy to Pantheon
       - name: deploy to Pantheon
         run: |
           echo "$SSH_PRIVATE_KEY" > ../private.key
