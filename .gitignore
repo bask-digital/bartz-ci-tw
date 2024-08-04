@@ -69,4 +69,4 @@ Thumbs.db
 .sass-cache
 
 build-metadata.json
-bash_env.txt
+#bash_env.txt
