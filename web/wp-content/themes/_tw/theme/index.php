@@ -24,7 +24,7 @@ get_header();
                 Get started
                 <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
             </a>
-            <a href="#" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-slate-900 border border-slate-300 rounded-lg hover:bg-slate-100 focus:ring-4 focus:ring-slate-100 dark:text-white dark:border-slate-700 dark:hover:bg-slate-700 dark:focus:ring-slate-800">
+            <a href="#" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-slate-900 border border-slate-300 rounded-lg hover:bg-slate-100 focus:ring-4 focus:ring-slate-100 dark:text-white dark:border-slate-700 dark:hover:bg-slate-700 dark:focus:ring-slate-900">
                 Speak to Sales
             </a> 
         </div>
@@ -33,7 +33,7 @@ get_header();
         </div>                
     </div>
 </section>
-<section class="bg-white dark:bg-slate-800">
+<section class="bg-white dark:bg-slate-900">
   <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
       <div class="max-w-screen-md mb-8 lg:mb-16">
           <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-slate-900 dark:text-white">Designed for business teams like yours</h2>
@@ -102,7 +102,7 @@ get_header();
         </div>
     </div>
 </section>
-<section class="bg-white dark:bg-slate-800">
+<section class="bg-white dark:bg-slate-900">
     <div class="gap-16 items-center py-8 px-4 mx-auto max-w-screen-xl lg:grid lg:grid-cols-2 lg:py-16 lg:px-6">
         <div class="font-light text-slate-500 sm:text-lg dark:text-slate-400">
             <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-slate-900 dark:text-white">We didn't reinvent the wheel</h2>
