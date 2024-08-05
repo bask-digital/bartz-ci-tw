@@ -22,6 +22,7 @@ env:
   GITHUB_OWNER: ${{ github.repository_owner }}
   CI_PROJECT_NAME: ${{ github.repository }}
 
+
 jobs:
   configure_env_vars:
     container:
@@ -30,10 +31,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-bash-env
         with:
@@ -81,10 +82,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Cache composer cache
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-composer-cache
         with:
@@ -96,7 +97,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-vendor
         with:
@@ -104,7 +105,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-web
         with:
@@ -112,7 +113,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('composer.lock') }}
 
       - name: Cache drush folder
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-drush
         with:
@@ -135,12 +136,12 @@ jobs:
     needs: [configure_env_vars, build_php]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
       - name: Cache bash_env.txt
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-bash-env
         with:
@@ -152,7 +153,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache composer cache
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-composer-cache
         with:
@@ -164,7 +165,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache vendor folder
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-vendor
         with:
@@ -172,7 +173,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('composer.lock') }}
 
       - name: Cache web folder
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-web
         with:
@@ -180,7 +181,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('composer.lock') }}
 
       - name: Cache drush folder
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         env:
           cache-name: cache-drush
         with:
